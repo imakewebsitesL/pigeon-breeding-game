@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pixel Birds — Evolution Habitat</title>
+<style>
+:root{--ui:#152018;--panel:#f4f0d8;--ink:#172018;--accent:#6c9b62}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#b8dca2;color:var(--ink)}
+body{overflow-x:hidden}.app{max-width:900px;margin:auto;min-height:100vh;background:#d8efbd}
+header{padding:12px 14px 8px;display:flex;justify-content:space-between;align-items:center;gap:8px;background:#f4f0d8;border-bottom:3px solid #263326;position:sticky;top:0;z-index:10}
+h1{font-size:18px;margin:0}.stats{font-size:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.badge{background:#dbe9c7;border:2px solid #52634b;border-radius:999px;padding:4px 7px}
+#world{position:relative;height:min(67vh,600px);min-height:430px;overflow:hidden;border-bottom:4px solid #33462f;background:linear-gradient(#a9d9f0 0 46%,#bfe19b 46% 100%)}
+.sun{position:absolute;width:62px;height:62px;border-radius:50%;background:#ffe08a;right:9%;top:8%;box-shadow:0 0 0 7px #ffe9a8}
+.cloud{position:absolute;background:#fff6dc;border-radius:30px;width:95px;height:25px;opacity:.8}.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}.cloud:before{width:35px;height:35px;left:18px;top:-18px}.cloud:after{width:45px;height:45px;left:45px;top:-25px}
+.tree{position:absolute;bottom:26%;width:25px;height:150px;background:#765033;border-radius:8px}.tree:before{content:"";position:absolute;width:150px;height:120px;left:-62px;top:-70px;background:#5d9856;border-radius:55% 45% 60% 45%;box-shadow:50px 15px #71aa61,-45px 20px #4f8b50}.tree.t2{transform:scale(.75);left:78%;bottom:29%}.tree.t3{transform:scale(.9);left:14%;bottom:31%}
+.grass{position:absolute;bottom:0;height:28%;width:100%;background:linear-gradient(#98c978 0 7px,#76b05f 7px 100%);border-top:3px solid #527f4b}
+.grass:after{content:"";position:absolute;inset:10px;background:repeating-linear-gradient(105deg,transparent 0 14px,#5c974e 15px 18px,transparent 19px 29px);opacity:.45}
+.food{position:absolute;z-index:2;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:20px;filter:drop-shadow(1px 2px #52634b);cursor:pointer;user-select:none}
+.bird{position:absolute;z-index:4;width:54px;height:42px;transform-origin:center;transition:left .7s linear,top .7s linear}
+.bird .body{position:absolute;left:8px;top:10px;width:34px;height:27px;background:var(--body);border:2px solid #273126;border-radius:55% 50% 45% 50%}
+.bird .head{position:absolute;left:31px;top:3px;width:22px;height:22px;background:var(--body);border:2px solid #273126;border-radius:50%}.bird .eye{position:absolute;left:44px;top:10px;width:4px;height:4px;background:#111;border-radius:50%;z-index:2}
+.bird .beak{position:absolute;left:51px;top:12px;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:var(--beak,9px) solid #d89b42;z-index:3}
+.bird .wing{position:absolute;left:15px;top:14px;width:18px;height:14px;background:var(--wing);border:2px solid #273126;border-radius:70% 25% 70% 30%;transform:rotate(18deg)}
+.bird .tail{position:absolute;left:3px;top:11px;width:var(--tail,20px);height:25px;background:var(--tailColor);clip-path:polygon(100% 50%,0 0,15% 50%,0 100%);border:0}
+.bird .legs{position:absolute;left:19px;top:35px;width:20px;height:var(--legs,9px);border-left:3px solid #9c6d38;border-right:3px solid #9c6d38}
+.bird .tag{position:absolute;left:-2px;top:-24px;font-size:9px;background:#fff8d9;border:1px solid #57614d;border-radius:6px;padding:2px 4px;white-space:nowrap;display:none}
+.bird.selected .tag{display:block}.flying{animation:flap .24s infinite alternate ease-in-out}@keyframes flap{to{transform:translateY(-3px) rotate(-2deg)}}
+.panel{padding:10px 12px 18px;background:#f4f0d8;border-top:3px solid #293529}.controls{display:flex;gap:8px;overflow:auto;padding-bottom:6px}.btn{border:2px solid #33462f;background:#dce9c9;border-radius:10px;padding:9px 12px;font-weight:700;white-space:nowrap}.btn:active{transform:translateY(1px)}.info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.card{background:#fff9df;border:2px solid #79836b;border-radius:10px;padding:9px}.card h2{font-size:13px;margin:0 0 5px}.small{font-size:11px;line-height:1.35}.genes{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gene{font-size:10px;background:#e5edd6;border-radius:5px;padding:4px}
+#log{font-size:11px;max-height:75px;overflow:auto;margin-top:7px}.toast{position:fixed;left:50%;bottom:15px;transform:translateX(-50%);background:#182219;color:#fff9df;padding:9px 13px;border-radius:10px;z-index:20;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1}
+@media(max-width:560px){header{align-items:flex-start}#world{height:58vh;min-height:410px}.info{grid-template-columns:1fr}.stats{max-width:58%}.tree.t3{left:8%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>🐦 Pixel Birds</h1><div class="stats"><span class="badge">Birds: <b id="count">2</b></span><span class="badge">Generation: <b id="gen">1</b></span></div></header>
+<main id="world">
+<div class="sun"></div><div class="cloud" style="left:10%;top:15%"></div><div class="cloud" style="left:55%;top:24%;transform:scale(.7)"></div>
+<div class="tree" style="left:40%;bottom:27%"></div><div class="tree t2"></div><div class="tree t3"></div><div class="grass"></div>
+</main>
+<section class="panel">
+<div class="controls"><button class="btn" onclick="addFood()">🍎 Drop food</button><button class="btn" onclick="encourageBreeding()">💕 Encourage breeding</button><button class="btn" onclick="selectRandom()">🔎 Inspect bird</button><button class="btn" onclick="toggleFast()">⏩ Speed: <span id="speed">1×</span></button></div>
+<div class="info"><div class="card"><h2 id="selectedTitle">Your starting pair</h2><div class="small" id="selectedText">Select a bird to inspect its inherited traits.</div><div class="genes" id="genes"></div></div><div class="card"><h2>🧬 How evolution works</h2><div class="small">Babies inherit a mixture of their parents' genes. Small mutations can create new colours, beak sizes, tail shapes, leg lengths and flight ability. Strongly different traits can accumulate over generations.</div><div id="log"></div></div></div>
+</section></div><div class="toast" id="toast"></div>
+<script>
+const world=document.getElementById('world');let birds=[],food=[],nextId=1,gen=1,speed=1,selected=null,breedTimer=0;
+const colors=['#d9d9d9','#b8b8b8','#8f8f8f','#f0d59b','#b86f45','#704b3b','#6e88a8','#8a6f9e','#e7b9c7','#5f7d55','#222831'];
+const wings=['#eeeeee','#9c9c9c','#756e64','#d4a77a','#7d4935','#5b6d8a','#6f596f','#d58e9d','#456446','#333842'];
+function rand(a,b){return Math.random()*(b-a)+a} function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function makeBird(sex,parentA=null,parentB=null){
+ let b={id:nextId++,sex,name:sex==='M'?'Male pigeon':'Female pigeon',gen:parentA?Math.max(parentA.gen,parentB.gen)+1:1,
+ color:'#b8b8b8',wing:'#9c9c9c',beak:9,tail:20,legs:9,flight:true,x:rand(15,75),y:rand(35,65),vx:rand(-1,1),vy:rand(-.4,.4),energy:80,age:0};
+ if(parentA){for(const k of ['color','wing','beak','tail','legs','flight']){b[k]=Math.random()<.5?parentA[k]:parentB[k]}
+  if(Math.random()<.22)b.color=pick(colors); if(Math.random()<.18)b.wing=pick(wings);
+  if(Math.random()<.16)b.beak=clamp(b.beak+pick([-3,-2,-1,1,2,3]),3,20);
+  if(Math.random()<.16)b.tail=clamp(b.tail+pick([-6,-3,3,6]),10,34);
+  if(Math.random()<.16)b.legs=clamp(b.legs+pick([-4,-2,2,4]),4,22);
+  if(Math.random()<.09)b.flight=!b.flight;
+ }
+ return b;
+}
+function addBird(b){birds.push(b);renderBird(b)}
+function renderBird(b){const el=document.createElement('div');el.className='bird';el.id='bird'+b.id;el.innerHTML='<div class="tag"></div><div class="tail"></div><div class="body"></div><div class="head"></div><div class="eye"></div><div class="beak"></div><div class="wing"></div><div class="legs"></div>';el.onclick=()=>inspect(b.id);world.appendChild(el);updateEl(b)}
+function updateEl(b){const e=document.getElementById('bird'+b.id);if(!e)return;e.style.left=b.x+'%';e.style.top=b.y+'%';e.style.setProperty('--body',b.color);e.style.setProperty('--wing',b.wing);e.style.setProperty('--beak',b.beak+'px');e.style.setProperty('--tail',b.tail+'px');e.style.setProperty('--tailColor',b.wing);e.style.setProperty('--legs',b.legs+'px');e.classList.toggle('flying',b.flight&&Math.abs(b.vx)>.5);e.classList.toggle('selected',selected===b.id);e.querySelector('.tag').textContent=b.sex+' • Gen '+b.gen}
+function inspect(id){selected=id;const b=birds.find(x=>x.id===id);if(!b)return;document.getElementById('selectedTitle').textContent=`${b.sex==='M'?'♂ Male':'♀ Female'} pigeon #${b.id}`;document.getElementById('selectedText').textContent=`Generation ${b.gen}. This bird's traits can be passed to future chicks.`;document.getElementById('genes').innerHTML=`<div class="gene">🎨 Colour: ${b.color}</div><div class="gene">🪶 Wing: ${b.wing}</div><div class="gene">👄 Beak: ${b.beak}px</div><div class="gene">🪶 Tail: ${b.tail}px</div><div class="gene">🦵 Legs: ${b.legs}px</div><div class="gene">✈️ Flight: ${b.flight?'Yes':'No'}</div>`;birds.forEach(updateEl)}
+function addFood(){const f=document.createElement('div');f.className='food';f.textContent=pick(['🌾','🌽','🍎']);f.style.left=rand(8,88)+'%';f.style.top=rand(52,84)+'%';world.appendChild(f);food.push({el:f,x:parseFloat(f.style.left),y:parseFloat(f.style.top)});toast('Food dropped! Birds will investigate.')}
+function breed(a,b){if(a.sex===b.sex)return;const baby=makeBird(Math.random()<.5?'M':'F',a,b);baby.x=(a.x+b.x)/2;baby.y=(a.y+b.y)/2;birds.push(baby);renderBird(baby);gen=Math.max(gen,baby.gen);document.getElementById('gen').textContent=gen;document.getElementById('count').textContent=birds.length;inspect(baby.id);toast(`🐣 A new chick was born! Generation ${baby.gen}`);log(`Chick #${baby.id} was born with a new mix of traits.`)}
+function encourageBreeding(){const males=birds.filter(b=>b.sex==='M'&&b.age>2),females=birds.filter(b=>b.sex==='F'&&b.age>2);if(males.length&&females.length){breed(pick(males),pick(females))}else toast('Your pigeons are still growing up!')}
+function selectRandom(){if(birds.length)inspect(pick(birds).id)}
+function toggleFast(){speed=speed===1?3:1;document.getElementById('speed').textContent=speed+'×';toast('Simulation speed: '+speed+'×')}
+function log(s){const l=document.getElementById('log');l.innerHTML=`• ${s}<br>`+l.innerHTML}
+function toast(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)}
+function tick(){for(const b of birds){b.age+=.01*speed;b.x+=b.vx*.10*speed;b.y+=b.vy*.06*speed;if(b.x<4||b.x>88)b.vx*=-1;if(b.y<32||b.y>76)b.vy*=-1;if(Math.random()<.02)b.vx+=rand(-.4,.4);if(Math.random()<.015)b.vy+=rand(-.3,.3);b.vx=clamp(b.vx,-1.8,1.8);b.vy=clamp(b.vy,-.8,.8);updateEl(b)}
+ if(birds.length>=2 && birds.length<28){breedTimer+=.01*speed;if(breedTimer>35){breedTimer=0;const m=pick(birds.filter(x=>x.sex==='M')),f=pick(birds.filter(x=>x.sex==='F'));if(m&&f&&m.age>2&&f.age>2)breed(m,f)}}}
+addBird(makeBird('M'));addBird(makeBird('F'));document.getElementById('count').textContent=birds.length;inspect(1);setInterval(tick,100);
+</script>
+</body>
+</html>
